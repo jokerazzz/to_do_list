@@ -16,6 +16,14 @@ class TaskItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final deadlineText = formatDateTime(task.deadline);
+    Color? completionColor;
+
+    if (task.completionDate != null) {
+      completionColor = task.completionDate!.isBefore(task.deadline)
+          ? Colors.green
+          : Colors.red;
+    }
 
     return ListTile(
       title: Text(
@@ -27,15 +35,27 @@ class TaskItem extends StatelessWidget {
               : theme.textTheme.bodyLarge?.color,
         ),
       ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Дедлайн: $deadlineText"),
+          if (task.completionDate != null)
+            Text(
+              "Завершено: ${formatDateTime(task.completionDate!)}",
+              style: TextStyle(color: completionColor),
+            ),
+        ],
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
             icon: Icon(
-                task.isCompleted
-                    ? Icons.check_box
-                    : Icons.check_box_outline_blank,
-                color: theme.primaryColor),
+              task.isCompleted
+                  ? Icons.check_box
+                  : Icons.check_box_outline_blank,
+              color: theme.primaryColor,
+            ),
             onPressed: onToggle,
           ),
           IconButton(

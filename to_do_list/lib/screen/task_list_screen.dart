@@ -8,33 +8,28 @@ class TaskListScreen extends StatefulWidget {
 }
 
 class _TaskListScreenState extends State<TaskListScreen> {
-  final List<Task> _tasks = [
-    Task(title: "Купить продукты"),
-    Task(title: "Сделать домашку"),
-    Task(title: "Позвонить другу"),
-    Task(title: "Пойти в зал"),
-    Task(title: "Сделать домашнюю работу"),
-  ];
+  final List<Task> _tasks = [];
   final TextEditingController _controller = TextEditingController();
+  DateTime? _selectedDeadline;
 
-  void _addTask() {
-    if (_controller.text.isNotEmpty) {
+  void _addTask() async {
+    if (_controller.text.isNotEmpty && _selectedDeadline != null) {
       setState(() {
-        _tasks.add(Task(title: _controller.text));
+        _tasks.add(Task(title: _controller.text, deadline: _selectedDeadline!));
         _controller.clear();
+        _selectedDeadline = null;
       });
     }
   }
 
-  void toggleTaskState(int index) {
-    bool currentState = _tasks[index].isCompleted;
-    bool newState = !currentState;
-    _tasks[index].isCompleted = newState;
-  }
-
   void _toggleTask(int index) {
     setState(() {
-      toggleTaskState(index);
+      _tasks[index].isCompleted = !_tasks[index].isCompleted;
+      if (_tasks[index].isCompleted) {
+        _tasks[index].completionDate = DateTime.now();
+      } else {
+        _tasks[index].completionDate = null;
+      }
     });
   }
 
@@ -42,6 +37,35 @@ class _TaskListScreenState extends State<TaskListScreen> {
     setState(() {
       _tasks.removeAt(index);
     });
+  }
+
+  Future<void> _pickDeadline(BuildContext context) async {
+    DateTime now = DateTime.now();
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: now.add(Duration(days: 365)),
+    );
+
+    if (pickedDate != null) {
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          _selectedDeadline = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+      }
+    }
   }
 
   @override
@@ -52,18 +76,31 @@ class _TaskListScreenState extends State<TaskListScreen> {
         children: [
           Padding(
             padding: EdgeInsets.all(8.0),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(labelText: "Новая задача"),
-                  ),
+                TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(labelText: "Новая задача"),
                 ),
-                IconButton(
-                  icon: Icon(Icons.add),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _selectedDeadline == null
+                            ? "Выберите дедлайн"
+                            : "Дедлайн: ${formatDateTime(_selectedDeadline!)}",
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.calendar_today),
+                      onPressed: () => _pickDeadline(context),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
                   onPressed: _addTask,
-                )
+                  child: Text("Добавить задачу"),
+                ),
               ],
             ),
           ),
