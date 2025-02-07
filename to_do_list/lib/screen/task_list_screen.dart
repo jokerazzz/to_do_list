@@ -8,7 +8,29 @@ class TaskListScreen extends StatefulWidget {
 }
 
 class _TaskListScreenState extends State<TaskListScreen> {
-  final List<Task> _tasks = [];
+  final List<Task> _tasks = [
+    Task(
+      title: 'Купить продукты',
+      deadline: DateTime.now().add(Duration(days: 1)),
+      category: 'Покупки',
+    ),
+    Task(
+      title: 'Встретиться с девушкой',
+      deadline: DateTime.now().add(Duration(days: 2)),
+      category: 'Встречи',
+    ),
+    Task(
+      title: 'Завершить проект на работе',
+      deadline: DateTime.now().add(Duration(days: 3)),
+      category: 'Работа',
+    ),
+    Task(
+      title: 'Просмотреть видеоурок в Attractor',
+      deadline: DateTime.now().add(Duration(days: 4)),
+      category: 'Обучение',
+    ),
+  ];
+
   final TextEditingController _controller = TextEditingController();
   DateTime? _selectedDeadline;
   String _selectedCategory = 'Все задачи';
@@ -19,11 +41,12 @@ class _TaskListScreenState extends State<TaskListScreen> {
       setState(() {
         _tasks.add(
           Task(
-              title: _controller.text,
-              deadline: _selectedDeadline!,
-              category: _selectedCategory == 'Все задачи'
-                  ? 'Без категории'
-                  : _selectedCategory),
+            title: _controller.text,
+            deadline: _selectedDeadline!,
+            category: _selectedCategory == 'Все задачи'
+                ? 'Без категории'
+                : _selectedCategory,
+          ),
         );
         _controller.clear();
         _selectedDeadline = null;
