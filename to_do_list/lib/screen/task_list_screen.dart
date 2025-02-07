@@ -86,7 +86,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
       appBar: AppBar(
         title: Text("Список задач"),
         actions: [
-          // Dropdown для выбора категории для фильтрации задач
           DropdownButton<String>(
             value: _selectedCategory,
             onChanged: (String? newValue) {
@@ -140,10 +139,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _tasks.length,
+              itemCount: filteredTasks.length,
               itemBuilder: (context, index) {
                 return TaskItem(
-                  task: _tasks[index],
+                  task: filteredTasks[index],
                   onToggle: () => _toggleTask(index),
                   onDelete: () => _deleteTask(index),
                 );
