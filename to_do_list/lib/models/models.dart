@@ -3,12 +3,13 @@ class Task {
   bool isCompleted;
   DateTime deadline;
   DateTime? completionDate;
-  Task({
-    required this.title,
-    required this.deadline,
-    this.isCompleted = false,
-    this.completionDate,
-  });
+  String category;
+  Task(
+      {required this.title,
+      required this.deadline,
+      this.isCompleted = false,
+      this.completionDate,
+      required this.category});
 }
 
 String formatDateTime(DateTime dateTime) {
