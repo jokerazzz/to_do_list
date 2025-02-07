@@ -11,11 +11,26 @@ class _TaskListScreenState extends State<TaskListScreen> {
   final List<Task> _tasks = [];
   final TextEditingController _controller = TextEditingController();
   DateTime? _selectedDeadline;
+  String _selectedCategory = 'Все задачи';
+  final List<String> _categories = [
+    'Все задачи',
+    'Покупки',
+    'Встречи',
+    'Работа',
+    'Обучение'
+  ];
 
   void _addTask() async {
     if (_controller.text.isNotEmpty && _selectedDeadline != null) {
       setState(() {
-        _tasks.add(Task(title: _controller.text, deadline: _selectedDeadline!));
+        _tasks.add(
+          Task(
+              title: _controller.text,
+              deadline: _selectedDeadline!,
+              category: _selectedCategory == 'Все задачи'
+                  ? 'Без категории'
+                  : _selectedCategory),
+        );
         _controller.clear();
         _selectedDeadline = null;
       });
@@ -70,8 +85,30 @@ class _TaskListScreenState extends State<TaskListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Task> filteredTasks = _selectedCategory == 'Все задачи'
+        ? _tasks
+        : _tasks.where((task) => task.category == _selectedCategory).toList();
+
     return Scaffold(
-      appBar: AppBar(title: Text("Список задач")),
+      appBar: AppBar(
+        title: Text("Список задач"),
+        actions: [
+          DropdownButton<String>(
+            value: _selectedCategory,
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedCategory = newValue!;
+              });
+            },
+            items: _categories.map((String category) {
+              return DropdownMenuItem<String>(
+                value: category,
+                child: Text(category),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
