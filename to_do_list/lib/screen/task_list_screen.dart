@@ -12,13 +12,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
   final TextEditingController _controller = TextEditingController();
   DateTime? _selectedDeadline;
   String _selectedCategory = 'Все задачи';
-  final List<String> _categories = [
-    'Все задачи',
-    'Покупки',
-    'Встречи',
-    'Работа',
-    'Обучение'
-  ];
+  final List<String> _categories = ['Покупки', 'Встречи', 'Работа', 'Обучение'];
 
   void _addTask() async {
     if (_controller.text.isNotEmpty && _selectedDeadline != null) {
@@ -88,11 +82,11 @@ class _TaskListScreenState extends State<TaskListScreen> {
     List<Task> filteredTasks = _selectedCategory == 'Все задачи'
         ? _tasks
         : _tasks.where((task) => task.category == _selectedCategory).toList();
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Список задач"),
         actions: [
+          // Dropdown для выбора категории для фильтрации задач
           DropdownButton<String>(
             value: _selectedCategory,
             onChanged: (String? newValue) {
@@ -100,7 +94,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
                 _selectedCategory = newValue!;
               });
             },
-            items: _categories.map((String category) {
+            items: [
+              'Все задачи',
+              ..._categories,
+            ].map((String category) {
               return DropdownMenuItem<String>(
                 value: category,
                 child: Text(category),
