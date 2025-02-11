@@ -28,44 +28,46 @@ class TaskItem extends StatelessWidget {
           : Colors.red;
     }
 
-    return ListTile(
-      title: Text(
-        task.title,
-        style: TextStyle(
-          decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-          color: task.isCompleted
-              ? theme.disabledColor
-              : theme.textTheme.bodyLarge?.color,
+    return Slidable(
+      child: ListTile(
+        title: Text(
+          task.title,
+          style: TextStyle(
+            decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+            color: task.isCompleted
+                ? theme.disabledColor
+                : theme.textTheme.bodyLarge?.color,
+          ),
         ),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Дедлайн: $deadlineText"),
-          if (task.completionDate != null)
-            Text(
-              "Завершено: ${formatDateTime(task.completionDate!)}",
-              style: TextStyle(color: completionColor),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Дедлайн: $deadlineText"),
+            if (task.completionDate != null)
+              Text(
+                "Завершено: ${formatDateTime(task.completionDate!)}",
+                style: TextStyle(color: completionColor),
+              ),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                task.isCompleted
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank,
+                color: theme.primaryColor,
+              ),
+              onPressed: onToggle,
             ),
-        ],
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: Icon(
-              task.isCompleted
-                  ? Icons.check_box
-                  : Icons.check_box_outline_blank,
-              color: theme.primaryColor,
+            IconButton(
+              icon: Icon(Icons.delete, color: theme.colorScheme.error),
+              onPressed: onDelete,
             ),
-            onPressed: onToggle,
-          ),
-          IconButton(
-            icon: Icon(Icons.delete, color: theme.colorScheme.error),
-            onPressed: onDelete,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
