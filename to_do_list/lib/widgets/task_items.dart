@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/models.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import '../models/models.dart';
 
 class TaskItem extends StatelessWidget {
   final Task task;
@@ -19,7 +19,8 @@ class TaskItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final deadlineText = formatDateTime(task.deadline);
+    final deadlineText =
+        task.deadline != null ? formatDateTime(task.deadline!) : "Без дедлайна";
     Color? completionColor;
 
     if (task.completionDate != null) {
@@ -29,6 +30,23 @@ class TaskItem extends StatelessWidget {
     }
 
     return Slidable(
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) => onEdit(),
+            backgroundColor: Colors.blue,
+            icon: Icons.edit,
+            label: 'Edit',
+          ),
+          SlidableAction(
+            onPressed: (context) => onDelete(),
+            backgroundColor: Colors.red,
+            icon: Icons.delete,
+            label: 'Delete',
+          ),
+        ],
+      ),
       child: ListTile(
         title: Text(
           task.title,
@@ -50,23 +68,12 @@ class TaskItem extends StatelessWidget {
               ),
           ],
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: Icon(
-                task.isCompleted
-                    ? Icons.check_box
-                    : Icons.check_box_outline_blank,
-                color: theme.primaryColor,
-              ),
-              onPressed: onToggle,
-            ),
-            IconButton(
-              icon: Icon(Icons.delete, color: theme.colorScheme.error),
-              onPressed: onDelete,
-            ),
-          ],
+        trailing: IconButton(
+          icon: Icon(
+            task.isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
+            color: theme.primaryColor,
+          ),
+          onPressed: onToggle,
         ),
       ),
     );
