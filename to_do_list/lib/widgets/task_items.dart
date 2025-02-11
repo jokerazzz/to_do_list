@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TaskItem extends StatelessWidget {
   final Task task;
   final VoidCallback onToggle;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
   const TaskItem({
     Key? key,
     required this.task,
     required this.onToggle,
     required this.onDelete,
+    required this.onEdit,
   }) : super(key: key);
 
   @override

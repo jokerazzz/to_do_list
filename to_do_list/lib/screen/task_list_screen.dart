@@ -168,6 +168,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   task: filteredTasks[index],
                   onToggle: () => _toggleTask(index),
                   onDelete: () => _deleteTask(index),
+                  onEdit: () {},
                 );
               },
             ),
