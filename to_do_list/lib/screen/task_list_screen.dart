@@ -100,6 +100,84 @@ class _TaskListScreenState extends State<TaskListScreen> {
     }
   }
 
+  void _editTask(int index) {
+    TextEditingController editController =
+        TextEditingController(text: _tasks[index].title);
+    DateTime? selectedDeadline = _tasks[index].deadline;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Редактировать задачу"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: editController,
+                decoration: InputDecoration(labelText: "Название задачи"),
+              ),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(selectedDeadline == null
+                        ? "Выберите дедлайн"
+                        : "Дедлайн: ${formatDateTime(selectedDeadline!)}"),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDeadline ?? DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(Duration(days: 365)),
+                      );
+                      if (pickedDate != null) {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (pickedTime != null) {
+                          setState(() {
+                            selectedDeadline = DateTime(
+                              pickedDate.year,
+                              pickedDate.month,
+                              pickedDate.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                          });
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Отмена"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _tasks[index].title = editController.text;
+                  _tasks[index].deadline = selectedDeadline!;
+                });
+                Navigator.pop(context);
+              },
+              child: Text("Сохранить"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Task> filteredTasks = _selectedCategory == 'Все задачи'
@@ -168,7 +246,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   task: filteredTasks[index],
                   onToggle: () => _toggleTask(index),
                   onDelete: () => _deleteTask(index),
-                  onEdit: () {},
+                  onEdit: () => _editTask(index),
                 );
               },
             ),
