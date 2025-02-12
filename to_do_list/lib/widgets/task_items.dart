@@ -23,8 +23,8 @@ class TaskItem extends StatelessWidget {
         task.deadline != null ? formatDateTime(task.deadline!) : "Без дедлайна";
     Color? completionColor;
 
-    if (task.completionDate != null) {
-      completionColor = task.completionDate!.isBefore(task.deadline)
+    if (task.completionDate != null && task.deadline != null) {
+      completionColor = task.completionDate!.isBefore(task.deadline!)
           ? Colors.green
           : Colors.red;
     }

@@ -8,41 +8,20 @@ class TaskListScreen extends StatefulWidget {
 }
 
 class _TaskListScreenState extends State<TaskListScreen> {
-  final List<Task> _tasks = [
-    Task(
-      title: 'Купить продукты',
-      deadline: DateTime.now().add(Duration(days: 1)),
-      category: 'Покупки',
-    ),
-    Task(
-      title: 'Встретиться с девушкой',
-      deadline: DateTime.now().add(Duration(days: 2)),
-      category: 'Встречи',
-    ),
-    Task(
-      title: 'Завершить проект на работе',
-      deadline: DateTime.now().add(Duration(days: 3)),
-      category: 'Работа',
-    ),
-    Task(
-      title: 'Просмотреть видеоурок в Attractor',
-      deadline: DateTime.now().add(Duration(days: 4)),
-      category: 'Обучение',
-    ),
-  ];
+  final List<Task> _tasks = [];
 
   final TextEditingController _controller = TextEditingController();
   DateTime? _selectedDeadline;
   String _selectedCategory = 'Все задачи';
   final List<String> _categories = ['Покупки', 'Встречи', 'Работа', 'Обучение'];
 
-  void _addTask() async {
-    if (_controller.text.isNotEmpty && _selectedDeadline != null) {
+  void _addTask() {
+    if (_controller.text.isNotEmpty) {
       setState(() {
         _tasks.add(
           Task(
             title: _controller.text,
-            deadline: _selectedDeadline!,
+            deadline: _selectedDeadline,
             category: _selectedCategory == 'Все задачи'
                 ? 'Без категории'
                 : _selectedCategory,
@@ -100,89 +79,14 @@ class _TaskListScreenState extends State<TaskListScreen> {
     }
   }
 
-  void _editTask(int index) {
-    TextEditingController editController =
-        TextEditingController(text: _tasks[index].title);
-    DateTime? selectedDeadline = _tasks[index].deadline;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Редактировать задачу"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: editController,
-                decoration: InputDecoration(labelText: "Название задачи"),
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(selectedDeadline == null
-                        ? "Выберите дедлайн"
-                        : "Дедлайн: ${formatDateTime(selectedDeadline!)}"),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDeadline ?? DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
-                      );
-                      if (pickedDate != null) {
-                        TimeOfDay? pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.now(),
-                        );
-                        if (pickedTime != null) {
-                          setState(() {
-                            selectedDeadline = DateTime(
-                              pickedDate.year,
-                              pickedDate.month,
-                              pickedDate.day,
-                              pickedTime.hour,
-                              pickedTime.minute,
-                            );
-                          });
-                        }
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Отмена"),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _tasks[index].title = editController.text;
-                  _tasks[index].deadline = selectedDeadline!;
-                });
-                Navigator.pop(context);
-              },
-              child: Text("Сохранить"),
-            ),
-          ],
-        );
-      },
-    );
+  void _clearDeadline() {
+    setState(() {
+      _selectedDeadline = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Task> filteredTasks = _selectedCategory == 'Все задачи'
-        ? _tasks
-        : _tasks.where((task) => task.category == _selectedCategory).toList();
     return Scaffold(
       appBar: AppBar(
         title: Text("Список задач"),
@@ -229,6 +133,11 @@ class _TaskListScreenState extends State<TaskListScreen> {
                       icon: Icon(Icons.calendar_today),
                       onPressed: () => _pickDeadline(context),
                     ),
+                    if (_selectedDeadline != null)
+                      IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: _clearDeadline,
+                      ),
                   ],
                 ),
                 ElevatedButton(
@@ -240,13 +149,13 @@ class _TaskListScreenState extends State<TaskListScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: filteredTasks.length,
+              itemCount: _tasks.length,
               itemBuilder: (context, index) {
                 return TaskItem(
-                  task: filteredTasks[index],
+                  task: _tasks[index],
                   onToggle: () => _toggleTask(index),
                   onDelete: () => _deleteTask(index),
-                  onEdit: () => _editTask(index),
+                  onEdit: () {},
                 );
               },
             ),
